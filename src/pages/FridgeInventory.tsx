@@ -1,15 +1,5 @@
 import { useState, useMemo } from 'react';
-
-type IngredientCategory = 'bread' | 'meat' | 'vegetables' | 'dairy' | 'other';
-
-type Ingredient = {
-  id: string;
-  name: string;
-  quantity?: string;
-  unit?: string;
-  category: IngredientCategory;
-  addedDate: Date;
-};
+import { useInventory, IngredientCategory } from '../context/InventoryContext';
 
 const categoryColors: Record<IngredientCategory, string> = {
   bread: '#f59e0b',
@@ -19,31 +9,13 @@ const categoryColors: Record<IngredientCategory, string> = {
   other: '#8b5cf6'
 };
 
-const categorizeIngredient = (name: string): IngredientCategory => {
-  const lowerName = name.toLowerCase();
-  
-  if (lowerName.match(/bread|toast|bagel|baguette|croissant|roll|bun/)) return 'bread';
-  if (lowerName.match(/chicken|beef|pork|turkey|lamb|fish|salmon|steak|meat/)) return 'meat';
-  if (lowerName.match(/broccoli|tomato|carrot|lettuce|spinach|pepper|onion|garlic|vegetable|cucumber|zucchini/)) return 'vegetables';
-  if (lowerName.match(/milk|cheese|yogurt|butter|cream|dairy|ice cream/)) return 'dairy';
-  
-  return 'other';
-};
-
 type FridgeInventoryProps = {
   onNavigateHome?: () => void;
 };
 
 function FridgeInventory({ onNavigateHome }: FridgeInventoryProps) {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { id: '1', name: 'Chicken breast', quantity: '500', unit: 'g', category: 'meat', addedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
-    { id: '2', name: 'Milk', quantity: '1', unit: 'L', category: 'dairy', addedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) },
-    { id: '3', name: 'Broccoli', quantity: '2', unit: 'heads', category: 'vegetables', addedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
-    { id: '4', name: 'Eggs', quantity: '12', unit: 'count', category: 'dairy', addedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
-    { id: '5', name: 'Sourdough bread', quantity: '1', unit: 'loaf', category: 'bread', addedDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) },
-    { id: '6', name: 'Salmon', quantity: '400', unit: 'g', category: 'meat', addedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
-    { id: '7', name: 'Tomato', quantity: '3', unit: 'count', category: 'vegetables', addedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
-  ]);
+  // Shared inventory — the Decision Gates recipe generator reads the same list.
+  const { ingredients, addIngredient: addToInventory, removeIngredient } = useInventory();
 
   const [inputName, setInputName] = useState('');
   const [inputQuantity, setInputQuantity] = useState('');
@@ -67,25 +39,10 @@ function FridgeInventory({ onNavigateHome }: FridgeInventoryProps) {
 
   const addIngredient = () => {
     if (!inputName.trim()) return;
-
-    const category = categorizeIngredient(inputName);
-    const newIngredient: Ingredient = {
-      id: `${Date.now()}`,
-      name: inputName.trim(),
-      quantity: inputQuantity || undefined,
-      unit: inputUnit || undefined,
-      category,
-      addedDate: new Date()
-    };
-
-    setIngredients((prev) => [...prev, newIngredient].sort((a, b) => b.addedDate.getTime() - a.addedDate.getTime()));
+    addToInventory(inputName, inputQuantity, inputUnit);
     setInputName('');
     setInputQuantity('');
     setInputUnit('');
-  };
-
-  const removeIngredient = (id: string) => {
-    setIngredients((prev) => prev.filter((item) => item.id !== id));
   };
 
   const formatDate = (date: Date) => {

@@ -3,6 +3,7 @@ import { useInventory } from './context/InventoryContext';
 import FridgeInventory from './pages/FridgeInventory';
 import DecisionGates from './pages/DecisionGates';
 import SupermarketInvoice from './pages/SupermarketInvoice';
+import RecipePage from './pages/RecipePage';
 
 type Page = 'home' | 'fridge' | 'recipe' | 'scan' | 'gates' | 'invoices';
 
@@ -11,6 +12,7 @@ type Recipe = {
   name: string;
   image?: string;
   description?: string;
+  cookTime: number;
   ingredients: string[];
   allInStock?: boolean;
 };
@@ -21,6 +23,7 @@ const sampleRecipes: Recipe[] = [
     name: 'Garlic Butter Chicken',
     description: 'Juicy pan-seared chicken with garlic and herbs',
     image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=300&fit=crop',
+    cookTime: 25,
     ingredients: ['chicken breast', 'garlic', 'butter', 'herbs', 'salt', 'pepper']
   },
   {
@@ -28,6 +31,7 @@ const sampleRecipes: Recipe[] = [
     name: 'Simple Veggie Toss',
     description: 'Fresh tomato and broccoli with garlic',
     image: 'https://images.unsplash.com/photo-1609501676725-7186f017a4b6?w=400&h=300&fit=crop',
+    cookTime: 15,
     ingredients: ['broccoli', 'tomato', 'garlic', 'salt', 'pepper'],
     allInStock: true
   },
@@ -36,6 +40,7 @@ const sampleRecipes: Recipe[] = [
     name: 'Pasta Carbonara',
     description: 'Creamy Italian pasta with bacon',
     image: 'https://images.unsplash.com/photo-1612874742237-6526221fcf4f?w=400&h=300&fit=crop',
+    cookTime: 20,
     ingredients: ['pasta', 'eggs', 'bacon', 'parmesan', 'black pepper']
   },
   {
@@ -43,6 +48,7 @@ const sampleRecipes: Recipe[] = [
     name: 'Grilled Salmon',
     description: 'Omega-3 rich salmon with lemon',
     image: 'https://images.unsplash.com/photo-1580959375944-abd7e991f971?w=400&h=300&fit=crop',
+    cookTime: 18,
     ingredients: ['salmon', 'lemon', 'olive oil', 'salt', 'pepper']
   },
   {
@@ -50,6 +56,7 @@ const sampleRecipes: Recipe[] = [
     name: 'Thai Green Curry',
     description: 'Spicy and aromatic coconut curry',
     image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1ae15f?w=400&h=300&fit=crop',
+    cookTime: 35,
     ingredients: ['coconut milk', 'curry paste', 'chicken', 'basil', 'lime']
   }
 ];
@@ -101,10 +108,15 @@ const alternativeRecipes: Recipe[] = sampleRecipes.slice(1);
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const { ingredients } = useInventory();
 
   const isActive = (page: Page) => currentPage === page;
   const fridgeStock = ingredients.map((i) => i.name);
+  const openRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    setCurrentPage('recipe');
+  };
 
   return (
     <>
@@ -114,6 +126,13 @@ function App() {
         <DecisionGates onNavigateHome={() => setCurrentPage('home')} />
       ) : currentPage === 'invoices' ? (
         <SupermarketInvoice onNavigateHome={() => setCurrentPage('home')} />
+      ) : currentPage === 'recipe' && selectedRecipe ? (
+        <RecipePage
+          recipe={selectedRecipe}
+          fridgeStock={fridgeStock}
+          onNavigateHome={() => setCurrentPage('home')}
+          onBack={() => setCurrentPage('home')}
+        />
       ) : (
         <div className="app-shell">
           <header>
@@ -143,13 +162,14 @@ function App() {
                 <div className="recipe-info">
                   <p className="recipe-label">Recipe of the day</p>
                   <h2>{recipeOfTheDay.name}</h2>
+                  <span className="cook-time-badge">⏱ {recipeOfTheDay.cookTime} min</span>
                   {recipeOfTheDay.description && <p className="recipe-description">{recipeOfTheDay.description}</p>}
                   <div className="recipe-highlights">
                     {recipeHighlights(recipeOfTheDay, fridgeStock, checkRecipeMatch(recipeOfTheDay, fridgeStock)).map((h, i) => (
                       <span key={i} className="highlight-tag">{h}</span>
                     ))}
                   </div>
-                  <button className="btn-select-recipe">Select this recipe</button>
+                  <button className="btn-select-recipe" onClick={() => openRecipe(recipeOfTheDay)}>Select this recipe</button>
                   <div className="ingredient-match">
                     <span className="match-item">✓ {checkRecipeMatch(recipeOfTheDay, fridgeStock).inStock} in stock</span>
                     <span className="match-item">✗ {checkRecipeMatch(recipeOfTheDay, fridgeStock).missing} missing</span>
@@ -176,7 +196,7 @@ function App() {
                         </div>
                         {isAllInStock && <p className="in-stock-badge">✓ Everything in stock</p>}
                         <p className="ingredient-status">✓ {match.inStock} | ✗ {match.missing}</p>
-                        <button onClick={() => {}} className="btn-select-alt">
+                        <button onClick={() => openRecipe(recipe)} className="btn-select-alt">
                           Choose
                         </button>
                       </div>

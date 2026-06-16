@@ -10,6 +10,8 @@ type Recipe = {
   name: string;
   image?: string;
   description?: string;
+  ingredients: string[];
+  allInStock?: boolean;
 };
 
 const sampleRecipes: Recipe[] = [
@@ -17,33 +19,57 @@ const sampleRecipes: Recipe[] = [
     id: '1',
     name: 'Garlic Butter Chicken',
     description: 'Juicy pan-seared chicken with garlic and herbs',
-    image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=300&fit=crop'
+    image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=300&fit=crop',
+    ingredients: ['chicken breast', 'garlic', 'butter', 'herbs', 'salt', 'pepper']
   },
   {
     id: '2',
-    name: 'Vegetable Stir-fry',
-    description: 'Fresh vegetables with a savory sauce',
-    image: 'https://images.unsplash.com/photo-1609501676725-7186f017a4b6?w=400&h=300&fit=crop'
+    name: 'Simple Veggie Toss',
+    description: 'Fresh tomato and broccoli with garlic',
+    image: 'https://images.unsplash.com/photo-1609501676725-7186f017a4b6?w=400&h=300&fit=crop',
+    ingredients: ['broccoli', 'tomato', 'garlic', 'salt', 'pepper'],
+    allInStock: true
   },
   {
     id: '3',
     name: 'Pasta Carbonara',
     description: 'Creamy Italian pasta with bacon',
-    image: 'https://images.unsplash.com/photo-1612874742237-6526221fcf4f?w=400&h=300&fit=crop'
+    image: 'https://images.unsplash.com/photo-1612874742237-6526221fcf4f?w=400&h=300&fit=crop',
+    ingredients: ['pasta', 'eggs', 'bacon', 'parmesan', 'black pepper']
   },
   {
     id: '4',
     name: 'Grilled Salmon',
     description: 'Omega-3 rich salmon with lemon',
-    image: 'https://images.unsplash.com/photo-1580959375944-abd7e991f971?w=400&h=300&fit=crop'
+    image: 'https://images.unsplash.com/photo-1580959375944-abd7e991f971?w=400&h=300&fit=crop',
+    ingredients: ['salmon', 'lemon', 'olive oil', 'salt', 'pepper']
   },
   {
     id: '5',
     name: 'Thai Green Curry',
     description: 'Spicy and aromatic coconut curry',
-    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1ae15f?w=400&h=300&fit=crop'
+    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1ae15f?w=400&h=300&fit=crop',
+    ingredients: ['coconut milk', 'curry paste', 'chicken', 'basil', 'lime']
   }
 ];
+
+const fridgeInventory = ['chicken breast', 'milk', 'broccoli', 'eggs', 'sourdough bread', 'salmon', 'tomato', 'butter', 'garlic', 'herbs', 'salt', 'pepper', 'olive oil'];
+
+const checkRecipeMatch = (recipe: Recipe): { inStock: number; missing: number } => {
+  let inStock = 0;
+  let missing = 0;
+  
+  recipe.ingredients.forEach((ingredient) => {
+    const lowerIngredient = ingredient.toLowerCase();
+    if (fridgeInventory.some((item) => item.toLowerCase().includes(lowerIngredient) || lowerIngredient.includes(item.toLowerCase()))) {
+      inStock++;
+    } else {
+      missing++;
+    }
+  });
+  
+  return { inStock, missing };
+};
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -94,6 +120,10 @@ function App() {
                   <h2>{recipeOfTheDay.name}</h2>
                   {recipeOfTheDay.description && <p className="recipe-description">{recipeOfTheDay.description}</p>}
                   <button className="btn-select-recipe">Select this recipe</button>
+                  <div className="ingredient-match">
+                    <span className="match-item">✓ {checkRecipeMatch(recipeOfTheDay).inStock} in stock</span>
+                    <span className="match-item">✗ {checkRecipeMatch(recipeOfTheDay).missing} missing</span>
+                  </div>
                 </div>
               </div>
             </section>
@@ -101,18 +131,30 @@ function App() {
             <section className="alternatives">
               <h3>Or choose from these alternatives</h3>
               <div className="recipe-list">
-                {alternativeRecipes.map((recipe) => (
-                  <div key={recipe.id} className="recipe-card-alt">
-                    {recipe.image && <img src={recipe.image} alt={recipe.name} className="recipe-thumb" />}
-                    <div className="recipe-alt-info">
-                      <h4>{recipe.name}</h4>
-                      {recipe.description && <p>{recipe.description}</p>}
-                      <button onClick={() => selectRecipe(recipe)} className="btn-select-alt">
-                        Choose
-                      </button>
+                {alternativeRecipes.map((recipe) => {
+                  const match = checkRecipeMatch(recipe);
+                  const isAllInStock = match.missing === 0;
+                  return (
+                    <div key={recipe.id} className={`recipe-card-alt ${isAllInStock ? 'all-in-stock' : ''}`}>
+                      {recipe.image && <img src={recipe.image} alt={recipe.name} className="recipe-thumb" />}
+                      <div className="recipe-alt-info">
+                        <h4>{recipe.name}</h4>
+                        {isAllInStock && <p className="in-stock-badge">✓ Everything in stock</p>}
+                        <p className="ingredient-status">✓ {match.inStock} | ✗ {match.missing}</p>
+                        <button onClick={() => selectRecipe(recipe)} className="btn-select-alt">
+                          Choose
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="grocery-summary">
+              <div className="grocery-card">
+                <p className="grocery-label">Total groceries in fridge</p>
+                <p className="grocery-count">{fridgeInventory.length} items</p>
               </div>
             </section>
           </main>

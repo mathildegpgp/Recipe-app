@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import InvoiceUpload from './InvoiceUpload';
-import FridgeInventory from './pages/FridgeInventory';
+import FridgeInventory, { Ingredient } from './pages/FridgeInventory';
 import DecisionGates from './pages/DecisionGates';
+import SupermarketInvoice from './pages/SupermarketInvoice';
 
 type Page = 'home' | 'fridge' | 'recipe' | 'scan' | 'gates' | 'invoices';
 
@@ -53,15 +53,13 @@ const sampleRecipes: Recipe[] = [
   }
 ];
 
-const fridgeInventory = ['chicken breast', 'milk', 'broccoli', 'eggs', 'sourdough bread', 'salmon', 'tomato', 'butter', 'garlic', 'herbs', 'salt', 'pepper', 'olive oil'];
-
-const checkRecipeMatch = (recipe: Recipe): { inStock: number; missing: number } => {
+const checkRecipeMatch = (recipe: Recipe, stock: string[]): { inStock: number; missing: number } => {
   let inStock = 0;
   let missing = 0;
   
   recipe.ingredients.forEach((ingredient) => {
     const lowerIngredient = ingredient.toLowerCase();
-    if (fridgeInventory.some((item) => item.toLowerCase().includes(lowerIngredient) || lowerIngredient.includes(item.toLowerCase()))) {
+    if (stock.some((item) => item.toLowerCase().includes(lowerIngredient) || lowerIngredient.includes(item.toLowerCase()))) {
       inStock++;
     } else {
       missing++;
@@ -75,20 +73,54 @@ function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [recipeOfTheDay, setRecipeOfTheDay] = useState<Recipe>(sampleRecipes[0]);
   const [alternativeRecipes, setAlternativeRecipes] = useState<Recipe[]>(sampleRecipes.slice(1));
+  const [ingredients, setIngredients] = useState<Ingredient[]>([
+    { id: '1', name: 'Chicken breast', quantity: '500', unit: 'g', category: 'meat', addedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
+    { id: '2', name: 'Milk', quantity: '1', unit: 'L', category: 'dairy', addedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) },
+    { id: '3', name: 'Broccoli', quantity: '2', unit: 'heads', category: 'vegetables', addedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
+    { id: '4', name: 'Eggs', quantity: '12', unit: 'count', category: 'dairy', addedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
+    { id: '5', name: 'Sourdough bread', quantity: '1', unit: 'loaf', category: 'bread', addedDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) },
+    { id: '6', name: 'Salmon', quantity: '400', unit: 'g', category: 'meat', addedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) },
+    { id: '7', name: 'Tomato', quantity: '3', unit: 'count', category: 'vegetables', addedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
+  ]);
+
   const selectRecipe = (recipe: Recipe) => {
     setRecipeOfTheDay(recipe);
     setAlternativeRecipes(sampleRecipes.filter((r) => r.id !== recipe.id));
   };
+
   const isActive = (page: Page) => currentPage === page;
+
+  const fridgeStock = ingredients.map((i) => i.name);
+
+  const addIngredient = (ingredient: Ingredient) => {
+    setIngredients((prev) => [...prev, ingredient].sort((a, b) => b.addedDate.getTime() - a.addedDate.getTime()));
+  };
+
+  const addIngredients = (items: Ingredient[]) => {
+    setIngredients((prev) => [...prev, ...items].sort((a, b) => b.addedDate.getTime() - a.addedDate.getTime()));
+  };
+
+  const removeIngredient = (id: string) => {
+    setIngredients((prev) => prev.filter((item) => item.id !== id));
+  };
 
   return (
     <>
       {currentPage === 'fridge' ? (
-        <FridgeInventory onNavigateHome={() => setCurrentPage('home')} />
+        <FridgeInventory
+          ingredients={ingredients}
+          onAddIngredient={addIngredient}
+          onRemoveIngredient={removeIngredient}
+          onNavigateHome={() => setCurrentPage('home')}
+        />
       ) : currentPage === 'gates' ? (
         <DecisionGates onNavigateHome={() => setCurrentPage('home')} />
       ) : currentPage === 'invoices' ? (
-        <InvoiceUpload onNavigateHome={() => setCurrentPage('home')} />
+        <SupermarketInvoice
+          ingredients={ingredients}
+          onAddIngredients={addIngredients}
+          onNavigateHome={() => setCurrentPage('home')}
+        />
       ) : (
         <div className="app-shell">
           <header>
@@ -100,11 +132,11 @@ function App() {
               <button onClick={() => setCurrentPage('fridge')} className={isActive('fridge') ? 'active' : ''}>
                 🧊 My Fridge
               </button>
+              <button onClick={() => setCurrentPage('invoices')} className={isActive('invoices') ? 'active' : ''}>
+                🧾 Invoices
+              </button>
               <button onClick={() => setCurrentPage('gates')} className={isActive('gates') ? 'active' : ''}>
                 🍳 Decision Gates
-              </button>
-              <button onClick={() => setCurrentPage('invoices')} className={isActive('invoices') ? 'active' : ''}>
-                📄 Invoices
               </button>
             </nav>
           </header>
@@ -121,8 +153,8 @@ function App() {
                   {recipeOfTheDay.description && <p className="recipe-description">{recipeOfTheDay.description}</p>}
                   <button className="btn-select-recipe">Select this recipe</button>
                   <div className="ingredient-match">
-                    <span className="match-item">✓ {checkRecipeMatch(recipeOfTheDay).inStock} in stock</span>
-                    <span className="match-item">✗ {checkRecipeMatch(recipeOfTheDay).missing} missing</span>
+                    <span className="match-item">✓ {checkRecipeMatch(recipeOfTheDay, fridgeStock).inStock} in stock</span>
+                    <span className="match-item">✗ {checkRecipeMatch(recipeOfTheDay, fridgeStock).missing} missing</span>
                   </div>
                 </div>
               </div>
@@ -132,7 +164,7 @@ function App() {
               <h3>Or choose from these alternatives</h3>
               <div className="recipe-list">
                 {alternativeRecipes.map((recipe) => {
-                  const match = checkRecipeMatch(recipe);
+                  const match = checkRecipeMatch(recipe, fridgeStock);
                   const isAllInStock = match.missing === 0;
                   return (
                     <div key={recipe.id} className={`recipe-card-alt ${isAllInStock ? 'all-in-stock' : ''}`}>
@@ -154,7 +186,7 @@ function App() {
             <section className="grocery-summary">
               <div className="grocery-card">
                 <p className="grocery-label">Total groceries in fridge</p>
-                <p className="grocery-count">{fridgeInventory.length} items</p>
+                <p className="grocery-count">{ingredients.length} items</p>
               </div>
             </section>
           </main>

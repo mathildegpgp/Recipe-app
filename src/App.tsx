@@ -44,20 +44,6 @@ const sampleRecipes: Recipe[] = [
   }
 ];
 
-// Each decision gate is an either/or choice that steers the recipe.
-type Gate = {
-  key: string;
-  label: string;
-  options: [string, string];
-};
-
-const decisionGates: Gate[] = [
-  { key: 'temperature', label: 'Temperature', options: ['Hot', 'Cold'] },
-  { key: 'flavor', label: 'Flavor', options: ['Sweet', 'Savory'] },
-  { key: 'complexity', label: 'Complexity', options: ['Simple', 'Elaborate'] },
-  { key: 'time', label: 'Time', options: ['Quick', 'Slow-cooked'] }
-];
-
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [recipeOfTheDay, setRecipeOfTheDay] = useState<Recipe>(sampleRecipes[0]);

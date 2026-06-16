@@ -70,6 +70,32 @@ const checkRecipeMatch = (recipe: Recipe, stock: string[]): { inStock: number; m
   return { inStock, missing };
 };
 
+const recipeHighlights = (recipe: Recipe, stock: string[], match: { inStock: number; missing: number }): string[] => {
+  const highlights: string[] = [];
+  const all = recipe.ingredients.map((i) => i.toLowerCase());
+  const stockLower = stock.map((i) => i.toLowerCase());
+
+  const hasProtein = all.some((i) => /chicken|beef|pork|salmon|eggs|bacon|turkey|fish|meat/.test(i));
+  const hasFiber = all.some((i) => /broccoli|vegetable|spinach|carrot|salad|bean|lentil|pea|kale/.test(i));
+  const hasOmega = all.some((i) => /salmon|fish|omega|nuts|seed|avocado/.test(i));
+  const hasCalcium = all.some((i) => /milk|cheese|yogurt|cream|parmesan/.test(i));
+  const isQuick = recipe.ingredients.length <= 4;
+
+  const stockUsed = recipe.ingredients.filter((ing) =>
+    stockLower.some((s) => s.includes(ing.toLowerCase()) || ing.toLowerCase().includes(s))
+  ).length;
+
+  if (hasProtein) highlights.push('High in protein');
+  if (hasFiber) highlights.push('Packed with fiber');
+  if (hasOmega) highlights.push('Rich in omega-3');
+  if (hasCalcium) highlights.push('Good source of calcium');
+  if (isQuick) highlights.push('Quick meal');
+  if (stockUsed >= 2) highlights.push(`Uses ${stockUsed} ingredient${stockUsed > 1 ? 's' : ''} from your fridge`);
+  if (match.missing === 0) highlights.push('All ingredients in stock');
+
+  return highlights.slice(0, 3);
+};
+
 const recipeOfTheDay: Recipe = sampleRecipes[0];
 const alternativeRecipes: Recipe[] = sampleRecipes.slice(1);
 
@@ -118,6 +144,11 @@ function App() {
                   <p className="recipe-label">Recipe of the day</p>
                   <h2>{recipeOfTheDay.name}</h2>
                   {recipeOfTheDay.description && <p className="recipe-description">{recipeOfTheDay.description}</p>}
+                  <div className="recipe-highlights">
+                    {recipeHighlights(recipeOfTheDay, fridgeStock, checkRecipeMatch(recipeOfTheDay, fridgeStock)).map((h, i) => (
+                      <span key={i} className="highlight-tag">{h}</span>
+                    ))}
+                  </div>
                   <button className="btn-select-recipe">Select this recipe</button>
                   <div className="ingredient-match">
                     <span className="match-item">✓ {checkRecipeMatch(recipeOfTheDay, fridgeStock).inStock} in stock</span>
@@ -138,6 +169,11 @@ function App() {
                       {recipe.image && <img src={recipe.image} alt={recipe.name} className="recipe-thumb" />}
                       <div className="recipe-alt-info">
                         <h4>{recipe.name}</h4>
+                        <div className="recipe-highlights-alt">
+                          {recipeHighlights(recipe, fridgeStock, match).map((h, i) => (
+                            <span key={i} className="highlight-tag-alt">{h}</span>
+                          ))}
+                        </div>
                         {isAllInStock && <p className="in-stock-badge">✓ Everything in stock</p>}
                         <p className="ingredient-status">✓ {match.inStock} | ✗ {match.missing}</p>
                         <button onClick={() => {}} className="btn-select-alt">

@@ -14,9 +14,7 @@ type FridgeInventoryProps = {
 };
 
 function FridgeInventory({ onNavigateHome }: FridgeInventoryProps) {
-  // Shared inventory — the Decision Gates recipe generator reads the same list.
-  const { ingredients, addIngredient: addToInventory, removeIngredient } = useInventory();
-
+  const { ingredients, addIngredient, removeIngredient } = useInventory();
   const [inputName, setInputName] = useState('');
   const [inputQuantity, setInputQuantity] = useState('');
   const [inputUnit, setInputUnit] = useState('');
@@ -29,17 +27,15 @@ function FridgeInventory({ onNavigateHome }: FridgeInventoryProps) {
       dairy: 0,
       other: 0
     };
-    
     ingredients.forEach((item) => {
       summary[item.category]++;
     });
-    
     return summary;
   }, [ingredients]);
 
-  const addIngredient = () => {
+  const handleAdd = () => {
     if (!inputName.trim()) return;
-    addToInventory(inputName, inputQuantity, inputUnit);
+    addIngredient(inputName, inputQuantity, inputUnit);
     setInputName('');
     setInputQuantity('');
     setInputUnit('');
@@ -50,14 +46,11 @@ function FridgeInventory({ onNavigateHome }: FridgeInventoryProps) {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) {
-      return 'today';
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'yesterday';
-    } else {
-      const daysAgo = Math.floor((today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-      return `${daysAgo} days ago`;
-    }
+    if (date.toDateString() === today.toDateString()) return 'today';
+    if (date.toDateString() === yesterday.toDateString()) return 'yesterday';
+
+    const daysAgo = Math.floor((today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    return `${daysAgo} days ago`;
   };
 
   return (
@@ -104,7 +97,7 @@ function FridgeInventory({ onNavigateHome }: FridgeInventoryProps) {
               placeholder="Ingredient name (e.g., Tomato)"
               value={inputName}
               onChange={(e) => setInputName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && addIngredient()}
+              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             />
             <input
               type="number"
@@ -118,7 +111,7 @@ function FridgeInventory({ onNavigateHome }: FridgeInventoryProps) {
               value={inputUnit}
               onChange={(e) => setInputUnit(e.target.value)}
             />
-            <button className="btn-add" onClick={addIngredient}>
+            <button className="btn-add" onClick={handleAdd}>
               + Add
             </button>
           </div>

@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useInventory } from './context/InventoryContext';
 import FridgeInventory from './pages/FridgeInventory';
 import DecisionGates from './pages/DecisionGates';
+import SupermarketInvoice from './pages/SupermarketInvoice';
 
-type Page = 'home' | 'fridge' | 'recipe' | 'scan' | 'gates';
+type Page = 'home' | 'fridge' | 'recipe' | 'scan' | 'gates' | 'invoices';
 
 type Recipe = {
   id: string;
@@ -52,34 +54,31 @@ const sampleRecipes: Recipe[] = [
   }
 ];
 
-const fridgeInventory = ['chicken breast', 'milk', 'broccoli', 'eggs', 'sourdough bread', 'salmon', 'tomato', 'butter', 'garlic', 'herbs', 'salt', 'pepper', 'olive oil'];
-
-const checkRecipeMatch = (recipe: Recipe): { inStock: number; missing: number } => {
+const checkRecipeMatch = (recipe: Recipe, stock: string[]): { inStock: number; missing: number } => {
   let inStock = 0;
   let missing = 0;
-  
+
   recipe.ingredients.forEach((ingredient) => {
     const lowerIngredient = ingredient.toLowerCase();
-    if (fridgeInventory.some((item) => item.toLowerCase().includes(lowerIngredient) || lowerIngredient.includes(item.toLowerCase()))) {
+    if (stock.some((item) => item.toLowerCase().includes(lowerIngredient) || lowerIngredient.includes(item.toLowerCase()))) {
       inStock++;
     } else {
       missing++;
     }
   });
-  
+
   return { inStock, missing };
 };
 
+const recipeOfTheDay: Recipe = sampleRecipes[0];
+const alternativeRecipes: Recipe[] = sampleRecipes.slice(1);
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [recipeOfTheDay, setRecipeOfTheDay] = useState<Recipe>(sampleRecipes[0]);
-  const [alternativeRecipes, setAlternativeRecipes] = useState<Recipe[]>(sampleRecipes.slice(1));
-  const selectRecipe = (recipe: Recipe) => {
-    setRecipeOfTheDay(recipe);
-    setAlternativeRecipes(sampleRecipes.filter((r) => r.id !== recipe.id));
-  };
-  // Helper avoids TypeScript narrowing the nav comparisons to "never".
+  const { ingredients } = useInventory();
+
   const isActive = (page: Page) => currentPage === page;
+  const fridgeStock = ingredients.map((i) => i.name);
 
   return (
     <>
@@ -87,6 +86,8 @@ function App() {
         <FridgeInventory onNavigateHome={() => setCurrentPage('home')} />
       ) : currentPage === 'gates' ? (
         <DecisionGates onNavigateHome={() => setCurrentPage('home')} />
+      ) : currentPage === 'invoices' ? (
+        <SupermarketInvoice onNavigateHome={() => setCurrentPage('home')} />
       ) : (
         <div className="app-shell">
           <header>
@@ -97,6 +98,9 @@ function App() {
               </button>
               <button onClick={() => setCurrentPage('fridge')} className={isActive('fridge') ? 'active' : ''}>
                 🧊 My Fridge
+              </button>
+              <button onClick={() => setCurrentPage('invoices')} className={isActive('invoices') ? 'active' : ''}>
+                🧾 Invoices
               </button>
               <button onClick={() => setCurrentPage('gates')} className={isActive('gates') ? 'active' : ''}>
                 🍳 Decision Gates
@@ -116,8 +120,8 @@ function App() {
                   {recipeOfTheDay.description && <p className="recipe-description">{recipeOfTheDay.description}</p>}
                   <button className="btn-select-recipe">Select this recipe</button>
                   <div className="ingredient-match">
-                    <span className="match-item">✓ {checkRecipeMatch(recipeOfTheDay).inStock} in stock</span>
-                    <span className="match-item">✗ {checkRecipeMatch(recipeOfTheDay).missing} missing</span>
+                    <span className="match-item">✓ {checkRecipeMatch(recipeOfTheDay, fridgeStock).inStock} in stock</span>
+                    <span className="match-item">✗ {checkRecipeMatch(recipeOfTheDay, fridgeStock).missing} missing</span>
                   </div>
                 </div>
               </div>
@@ -127,7 +131,7 @@ function App() {
               <h3>Or choose from these alternatives</h3>
               <div className="recipe-list">
                 {alternativeRecipes.map((recipe) => {
-                  const match = checkRecipeMatch(recipe);
+                  const match = checkRecipeMatch(recipe, fridgeStock);
                   const isAllInStock = match.missing === 0;
                   return (
                     <div key={recipe.id} className={`recipe-card-alt ${isAllInStock ? 'all-in-stock' : ''}`}>
@@ -136,7 +140,7 @@ function App() {
                         <h4>{recipe.name}</h4>
                         {isAllInStock && <p className="in-stock-badge">✓ Everything in stock</p>}
                         <p className="ingredient-status">✓ {match.inStock} | ✗ {match.missing}</p>
-                        <button onClick={() => selectRecipe(recipe)} className="btn-select-alt">
+                        <button onClick={() => {}} className="btn-select-alt">
                           Choose
                         </button>
                       </div>
@@ -149,7 +153,7 @@ function App() {
             <section className="grocery-summary">
               <div className="grocery-card">
                 <p className="grocery-label">Total groceries in fridge</p>
-                <p className="grocery-count">{fridgeInventory.length} items</p>
+                <p className="grocery-count">{ingredients.length} items</p>
               </div>
             </section>
           </main>

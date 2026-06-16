@@ -2,7 +2,6 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 
 export type IngredientCategory = 'bread' | 'meat' | 'vegetables' | 'dairy' | 'other';
 
-// One shared ingredient that any page can read or update.
 export type Ingredient = {
   id: string;
   name: string;
@@ -12,13 +11,11 @@ export type Ingredient = {
   addedDate: Date;
 };
 
-// Guess a category from the ingredient name so every source (fridge, gates,
-// future receipt scan) categorizes consistently.
 export const categorizeIngredient = (name: string): IngredientCategory => {
   const lowerName = name.toLowerCase();
   if (lowerName.match(/bread|toast|bagel|baguette|croissant|roll|bun/)) return 'bread';
-  if (lowerName.match(/chicken|beef|pork|turkey|lamb|fish|salmon|steak|meat/)) return 'meat';
-  if (lowerName.match(/broccoli|tomato|carrot|lettuce|spinach|pepper|onion|garlic|vegetable|cucumber|zucchini/)) return 'vegetables';
+  if (lowerName.match(/chicken|beef|pork|turkey|lamb|fish|salmon|steak|meat|mince/)) return 'meat';
+  if (lowerName.match(/broccoli|tomato|carrot|lettuce|spinach|pepper|onion|garlic|vegetable|cucumber|zucchini|potato|salad|avocado|mushroom/)) return 'vegetables';
   if (lowerName.match(/milk|cheese|yogurt|butter|cream|dairy|ice cream/)) return 'dairy';
   return 'other';
 };
@@ -26,6 +23,7 @@ export const categorizeIngredient = (name: string): IngredientCategory => {
 type InventoryContextValue = {
   ingredients: Ingredient[];
   addIngredient: (name: string, quantity?: string, unit?: string) => void;
+  addIngredients: (items: Ingredient[]) => void;
   removeIngredient: (id: string) => void;
 };
 
@@ -57,18 +55,21 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     setIngredients((prev) => [...prev, next].sort((a, b) => b.addedDate.getTime() - a.addedDate.getTime()));
   };
 
+  const addIngredients = (items: Ingredient[]) => {
+    setIngredients((prev) => [...prev, ...items].sort((a, b) => b.addedDate.getTime() - a.addedDate.getTime()));
+  };
+
   const removeIngredient = (id: string) => {
     setIngredients((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
-    <InventoryContext.Provider value={{ ingredients, addIngredient, removeIngredient }}>
+    <InventoryContext.Provider value={{ ingredients, addIngredient, addIngredients, removeIngredient }}>
       {children}
     </InventoryContext.Provider>
   );
 }
 
-// Small helper so pages can grab the shared inventory with one call.
 export function useInventory() {
   const ctx = useContext(InventoryContext);
   if (!ctx) {

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import FridgeInventory from './pages/FridgeInventory';
+import DecisionGates from './pages/DecisionGates';
 
-type Page = 'home' | 'fridge' | 'recipe' | 'scan';
+type Page = 'home' | 'fridge' | 'recipe' | 'scan' | 'gates';
 
 type Recipe = {
   id: string;
@@ -51,21 +52,28 @@ function App() {
     setRecipeOfTheDay(recipe);
     setAlternativeRecipes(sampleRecipes.filter((r) => r.id !== recipe.id));
   };
+  // Helper avoids TypeScript narrowing the nav comparisons to "never".
+  const isActive = (page: Page) => currentPage === page;
 
   return (
     <>
       {currentPage === 'fridge' ? (
         <FridgeInventory onNavigateHome={() => setCurrentPage('home')} />
+      ) : currentPage === 'gates' ? (
+        <DecisionGates onNavigateHome={() => setCurrentPage('home')} />
       ) : (
         <div className="app-shell">
           <header>
             <h1>Scan-and-snack</h1>
             <nav className="header-nav">
-              <button onClick={() => setCurrentPage('home')} className={currentPage === 'home' ? 'active' : ''}>
+              <button onClick={() => setCurrentPage('home')} className={isActive('home') ? 'active' : ''}>
                 Home
               </button>
-              <button onClick={() => setCurrentPage('fridge')} className={currentPage === 'fridge' ? 'active' : ''}>
+              <button onClick={() => setCurrentPage('fridge')} className={isActive('fridge') ? 'active' : ''}>
                 🧊 My Fridge
+              </button>
+              <button onClick={() => setCurrentPage('gates')} className={isActive('gates') ? 'active' : ''}>
+                🍳 Decision Gates
               </button>
             </nav>
           </header>

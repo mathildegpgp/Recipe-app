@@ -549,7 +549,85 @@ textarea {
   transform: scale(1.05);
 }
 
+/* Decision Gates Page Styles */
+.gates-section .card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 8px 24px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+}
+
+.gate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.gate-row:last-child {
+  border-bottom: none;
+}
+
+.gate-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #111827;
+}
+
+.gate-options {
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.gate-btn {
+  background: transparent;
+  color: #475569;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gate-btn:hover {
+  background: #e2e8f0;
+}
+
+.gate-btn.active {
+  background: #5b21b6;
+  color: white;
+}
+
+.gate-summary {
+  margin-top: 28px;
+}
+
+.gate-summary h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.gate-summary p {
+  color: #4b5563;
+  font-size: 16px;
+}
+
 @media (max-width: 768px) {
+  .gate-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
   .add-form {
     grid-template-columns: 1fr;
   }

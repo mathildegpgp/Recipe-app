@@ -21,12 +21,35 @@ const initialPrefs: Preferences = {
   notes: ''
 };
 
+// Each decision gate is an either/or choice that steers the recipe.
+type Gate = {
+  key: string;
+  label: string;
+  options: [string, string];
+};
+
+const decisionGates: Gate[] = [
+  { key: 'temperature', label: 'Temperature', options: ['Hot', 'Cold'] },
+  { key: 'flavor', label: 'Flavor', options: ['Sweet', 'Savory'] },
+  { key: 'complexity', label: 'Complexity', options: ['Simple', 'Elaborate'] },
+  { key: 'time', label: 'Time', options: ['Quick', 'Slow-cooked'] }
+];
+
 function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [prefs, setPrefs] = useState<Preferences>(initialPrefs);
   const [notes, setNotes] = useState('Enter your receipt or fridge scan data to begin.');
   const [recipe, setRecipe] = useState('');
   const [manualInput, setManualInput] = useState('');
+  // Tracks which side of each gate the user picked, e.g. { temperature: 'Hot' }
+  const [gates, setGates] = useState<Record<string, string>>({});
+
+  const pickGate = (key: string, choice: string) => {
+    setGates((prev) =>
+      // Clicking the already-selected option turns it off again.
+      prev[key] === choice ? { ...prev, [key]: '' } : { ...prev, [key]: choice }
+    );
+  };
 
   const addManualIngredient = () => {
     if (!manualInput.trim()) return;
@@ -48,8 +71,13 @@ function App() {
 
   const generateRecipe = () => {
     const ingredientList = ingredients.map((item) => item.name).join(', ') || 'no ingredients';
+    const gateChoices =
+      decisionGates
+        .map((gate) => gates[gate.key] && `${gate.label}: ${gates[gate.key]}`)
+        .filter(Boolean)
+        .join(', ') || 'no preference';
     setRecipe(
-      `Recipe idea based on ${ingredientList}. Effort: ${prefs.effort}. Dietary tags: ${prefs.dietaryTags.join(
+      `Recipe idea based on ${ingredientList}. Style: ${gateChoices}. Effort: ${prefs.effort}. Dietary tags: ${prefs.dietaryTags.join(
         ', '
       ) || 'none'}. Avoid: ${prefs.bannedIngredients || 'none'}. Notes: ${prefs.notes}`
     );
@@ -145,6 +173,30 @@ function App() {
                 placeholder="Any food preference notes"
               />
             </label>
+          </div>
+        </section>
+
+        <section className="pane">
+          <h2>Decision Gates</h2>
+          <p className="pane-hint">Steer the recipe by choosing a side. Click again to clear.</p>
+          <div className="card">
+            {decisionGates.map((gate) => (
+              <div className="gate-row" key={gate.key}>
+                <span className="gate-label">{gate.label}</span>
+                <div className="gate-options">
+                  {gate.options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className={gates[gate.key] === option ? 'gate-btn active' : 'gate-btn'}
+                      onClick={() => pickGate(gate.key, option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 

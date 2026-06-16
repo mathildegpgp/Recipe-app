@@ -144,6 +144,56 @@ textarea {
   color: white;
 }
 
+.pane-hint {
+  margin: 4px 0 16px;
+  color: #6b7280;
+}
+
+.gate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.gate-row:last-child {
+  border-bottom: none;
+}
+
+.gate-label {
+  font-weight: 600;
+}
+
+.gate-options {
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.gate-btn {
+  background: transparent;
+  color: #475569;
+  padding: 8px 20px;
+  border-radius: 999px;
+}
+
+.gate-btn:hover {
+  background: #e2e8f0;
+}
+
+.gate-btn.active {
+  background: #5b21b6;
+  color: white;
+}
+
+.gate-btn.active:hover {
+  background: #4c1d95;
+}
+
 .output-card pre {
   white-space: pre-wrap;
   background: #f8fafc;

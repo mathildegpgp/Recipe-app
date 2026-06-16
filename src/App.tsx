@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import InvoiceUpload from './InvoiceUpload';
 
 type Ingredient = {
   id: string;
@@ -22,6 +23,7 @@ const initialPrefs: Preferences = {
 };
 
 function App() {
+  const [tab, setTab] = useState<'recipe' | 'invoices'>('recipe');
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [prefs, setPrefs] = useState<Preferences>(initialPrefs);
   const [notes, setNotes] = useState('Enter your receipt or fridge scan data to begin.');
@@ -60,9 +62,21 @@ function App() {
       <header>
         <h1>Recipe Inventory AI</h1>
         <p>Generate dinner recipes from your receipt, fridge, or manual ingredients.</p>
+        <nav className="tabs">
+          <button className={tab === 'recipe' ? 'active' : ''} onClick={() => setTab('recipe')}>
+            Recipes
+          </button>
+          <button className={tab === 'invoices' ? 'active' : ''} onClick={() => setTab('invoices')}>
+            Invoices
+          </button>
+        </nav>
       </header>
 
       <main>
+        {tab === 'invoices' && <InvoiceUpload />}
+
+        {tab === 'recipe' && (
+        <>
         <section className="pane">
           <h2>Inventory</h2>
           <div className="grid">
@@ -155,6 +169,8 @@ function App() {
             <pre>{recipe || 'Your recipe output will appear here.'}</pre>
           </div>
         </section>
+        </>
+        )}
       </main>
     </div>
   );

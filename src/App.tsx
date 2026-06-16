@@ -1,178 +1,124 @@
 import { useState } from 'react';
 import InvoiceUpload from './InvoiceUpload';
+import FridgeInventory from './pages/FridgeInventory';
+import DecisionGates from './pages/DecisionGates';
 
-type Ingredient = {
+type Page = 'home' | 'fridge' | 'recipe' | 'scan' | 'gates' | 'invoices';
+
+type Recipe = {
   id: string;
   name: string;
-  quantity: string;
-  source: 'receipt' | 'fridge' | 'manual';
+  image?: string;
+  description?: string;
 };
 
-type Preferences = {
-  effort: string;
-  dietaryTags: string[];
-  bannedIngredients: string;
-  notes: string;
-};
-
-const initialPrefs: Preferences = {
-  effort: '30 min',
-  dietaryTags: [],
-  bannedIngredients: '',
-  notes: ''
-};
+const sampleRecipes: Recipe[] = [
+  {
+    id: '1',
+    name: 'Garlic Butter Chicken',
+    description: 'Juicy pan-seared chicken with garlic and herbs',
+    image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400&h=300&fit=crop'
+  },
+  {
+    id: '2',
+    name: 'Vegetable Stir-fry',
+    description: 'Fresh vegetables with a savory sauce',
+    image: 'https://images.unsplash.com/photo-1609501676725-7186f017a4b6?w=400&h=300&fit=crop'
+  },
+  {
+    id: '3',
+    name: 'Pasta Carbonara',
+    description: 'Creamy Italian pasta with bacon',
+    image: 'https://images.unsplash.com/photo-1612874742237-6526221fcf4f?w=400&h=300&fit=crop'
+  },
+  {
+    id: '4',
+    name: 'Grilled Salmon',
+    description: 'Omega-3 rich salmon with lemon',
+    image: 'https://images.unsplash.com/photo-1580959375944-abd7e991f971?w=400&h=300&fit=crop'
+  },
+  {
+    id: '5',
+    name: 'Thai Green Curry',
+    description: 'Spicy and aromatic coconut curry',
+    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1ae15f?w=400&h=300&fit=crop'
+  }
+];
 
 function App() {
-  const [tab, setTab] = useState<'recipe' | 'invoices'>('recipe');
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [prefs, setPrefs] = useState<Preferences>(initialPrefs);
-  const [notes, setNotes] = useState('Enter your receipt or fridge scan data to begin.');
-  const [recipe, setRecipe] = useState('');
-  const [manualInput, setManualInput] = useState('');
-
-  const addManualIngredient = () => {
-    if (!manualInput.trim()) return;
-    setIngredients((prev) => [
-      ...prev,
-      {
-        id: `${Date.now()}-${prev.length}`,
-        name: manualInput.trim(),
-        quantity: '1',
-        source: 'manual'
-      }
-    ]);
-    setManualInput('');
+  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [recipeOfTheDay, setRecipeOfTheDay] = useState<Recipe>(sampleRecipes[0]);
+  const [alternativeRecipes, setAlternativeRecipes] = useState<Recipe[]>(sampleRecipes.slice(1));
+  const selectRecipe = (recipe: Recipe) => {
+    setRecipeOfTheDay(recipe);
+    setAlternativeRecipes(sampleRecipes.filter((r) => r.id !== recipe.id));
   };
-
-  const removeIngredient = (id: string) => {
-    setIngredients((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const generateRecipe = () => {
-    const ingredientList = ingredients.map((item) => item.name).join(', ') || 'no ingredients';
-    setRecipe(
-      `Recipe idea based on ${ingredientList}. Effort: ${prefs.effort}. Dietary tags: ${prefs.dietaryTags.join(
-        ', '
-      ) || 'none'}. Avoid: ${prefs.bannedIngredients || 'none'}. Notes: ${prefs.notes}`
-    );
-  };
+  const isActive = (page: Page) => currentPage === page;
 
   return (
-    <div className="app-shell">
-      <header>
-        <h1>Recipe Inventory AI</h1>
-        <p>Generate dinner recipes from your receipt, fridge, or manual ingredients.</p>
-        <nav className="tabs">
-          <button className={tab === 'recipe' ? 'active' : ''} onClick={() => setTab('recipe')}>
-            Recipes
-          </button>
-          <button className={tab === 'invoices' ? 'active' : ''} onClick={() => setTab('invoices')}>
-            Invoices
-          </button>
-        </nav>
-      </header>
+    <>
+      {currentPage === 'fridge' ? (
+        <FridgeInventory onNavigateHome={() => setCurrentPage('home')} />
+      ) : currentPage === 'gates' ? (
+        <DecisionGates onNavigateHome={() => setCurrentPage('home')} />
+      ) : currentPage === 'invoices' ? (
+        <InvoiceUpload onNavigateHome={() => setCurrentPage('home')} />
+      ) : (
+        <div className="app-shell">
+          <header>
+            <h1>Scan-and-snack</h1>
+            <nav className="header-nav">
+              <button onClick={() => setCurrentPage('home')} className={isActive('home') ? 'active' : ''}>
+                Home
+              </button>
+              <button onClick={() => setCurrentPage('fridge')} className={isActive('fridge') ? 'active' : ''}>
+                🧊 My Fridge
+              </button>
+              <button onClick={() => setCurrentPage('gates')} className={isActive('gates') ? 'active' : ''}>
+                🍳 Decision Gates
+              </button>
+              <button onClick={() => setCurrentPage('invoices')} className={isActive('invoices') ? 'active' : ''}>
+                📄 Invoices
+              </button>
+            </nav>
+          </header>
 
-      <main>
-        {tab === 'invoices' && <InvoiceUpload />}
-
-        {tab === 'recipe' && (
-        <>
-        <section className="pane">
-          <h2>Inventory</h2>
-          <div className="grid">
-            <div className="card">
-              <h3>Manual ingredient entry</h3>
-              <div className="input-row">
-                <input
-                  value={manualInput}
-                  onChange={(e) => setManualInput(e.target.value)}
-                  placeholder="e.g. chicken breast"
-                />
-                <button onClick={addManualIngredient}>Add</button>
+          <main className="home-page">
+            <section className="recipe-of-the-day">
+              <div className="recipe-card-featured">
+                {recipeOfTheDay.image && (
+                  <img src={recipeOfTheDay.image} alt={recipeOfTheDay.name} className="recipe-image" />
+                )}
+                <div className="recipe-info">
+                  <p className="recipe-label">Recipe of the day</p>
+                  <h2>{recipeOfTheDay.name}</h2>
+                  {recipeOfTheDay.description && <p className="recipe-description">{recipeOfTheDay.description}</p>}
+                  <button className="btn-select-recipe">Select this recipe</button>
+                </div>
               </div>
-              <ul className="ingredient-list">
-                {ingredients.map((item) => (
-                  <li key={item.id}>
-                    <span>{item.name}</span>
-                    <button onClick={() => removeIngredient(item.id)}>Remove</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </section>
 
-            <div className="card">
-              <h3>Receipt / Fridge Scan</h3>
-              <p>{notes}</p>
-              <button onClick={() => setNotes('Receipt and fridge scan are coming soon.')}>Simulate scan</button>
-            </div>
-          </div>
-        </section>
-
-        <section className="pane">
-          <h2>Preferences</h2>
-          <div className="card">
-            <label>
-              Effort level
-              <select value={prefs.effort} onChange={(e) => setPrefs({ ...prefs, effort: e.target.value })}>
-                <option>15 min</option>
-                <option>30 min</option>
-                <option>45 min</option>
-                <option>60 min</option>
-              </select>
-            </label>
-
-            <label>
-              Dietary tags
-              <div className="tag-row">
-                {['Vegetarian', 'Vegan', 'Dairy-free', 'Gluten-free', 'Keto'].map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    className={prefs.dietaryTags.includes(tag) ? 'active' : ''}
-                    onClick={() => {
-                      const nextTags = prefs.dietaryTags.includes(tag)
-                        ? prefs.dietaryTags.filter((item) => item !== tag)
-                        : [...prefs.dietaryTags, tag];
-                      setPrefs({ ...prefs, dietaryTags: nextTags });
-                    }}
-                  >
-                    {tag}
-                  </button>
+            <section className="alternatives">
+              <h3>Or choose from these alternatives</h3>
+              <div className="recipe-list">
+                {alternativeRecipes.map((recipe) => (
+                  <div key={recipe.id} className="recipe-card-alt">
+                    {recipe.image && <img src={recipe.image} alt={recipe.name} className="recipe-thumb" />}
+                    <div className="recipe-alt-info">
+                      <h4>{recipe.name}</h4>
+                      {recipe.description && <p>{recipe.description}</p>}
+                      <button onClick={() => selectRecipe(recipe)} className="btn-select-alt">
+                        Choose
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </label>
-
-            <label>
-              Banned ingredients
-              <input
-                value={prefs.bannedIngredients}
-                onChange={(e) => setPrefs({ ...prefs, bannedIngredients: e.target.value })}
-                placeholder="e.g. dairy, onion"
-              />
-            </label>
-
-            <label>
-              Notes
-              <textarea
-                value={prefs.notes}
-                onChange={(e) => setPrefs({ ...prefs, notes: e.target.value })}
-                placeholder="Any food preference notes"
-              />
-            </label>
-          </div>
-        </section>
-
-        <section className="pane">
-          <h2>Recipe Output</h2>
-          <div className="card output-card">
-            <button onClick={generateRecipe}>Generate recipe</button>
-            <pre>{recipe || 'Your recipe output will appear here.'}</pre>
-          </div>
-        </section>
-        </>
-        )}
-      </main>
-    </div>
+            </section>
+          </main>
+        </div>
+      )}
+    </>
   );
 }
 

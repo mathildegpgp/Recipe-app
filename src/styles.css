@@ -41,6 +41,199 @@ header p {
   max-width: 700px;
 }
 
+.header-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.header-nav button {
+  padding: 10px 18px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.header-nav button:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.header-nav button.active {
+  background: #5b21b6;
+  color: white;
+  border-color: #5b21b6;
+}
+
+/* Home Page Styles */
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.recipe-of-the-day {
+  margin-bottom: 20px;
+}
+
+.recipe-card-featured {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.recipe-card-featured:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.15);
+}
+
+.recipe-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+.recipe-info {
+  padding: 32px;
+}
+
+.recipe-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #7c3aed;
+}
+
+.recipe-info h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  color: #111827;
+}
+
+.recipe-description {
+  margin: 0 0 20px;
+  font-size: 16px;
+  color: #4b5563;
+}
+
+.btn-select-recipe {
+  background: linear-gradient(135deg, #5b21b6, #7c3aed);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-select-recipe:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(91, 33, 182, 0.3);
+}
+
+.alternatives {
+  margin-bottom: 20px;
+}
+
+.alternatives h3 {
+  font-size: 20px;
+  margin: 0 0 20px;
+  color: #111827;
+}
+
+.recipe-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.recipe-card-alt {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 120px;
+  justify-content: space-between;
+}
+
+.recipe-card-alt:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  border-color: #d1d5db;
+}
+
+.recipe-thumb {
+  display: none;
+}
+
+.recipe-alt-info {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.recipe-alt-info h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.3;
+}
+
+.recipe-alt-info p {
+  display: none;
+}
+
+.btn-select-alt {
+  background: #f3f4f6;
+  color: #5b21b6;
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btn-select-alt:hover {
+  background: #5b21b6;
+  color: white;
+  border-color: #5b21b6;
+}
+
+@media (max-width: 1024px) {
+  .recipe-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .recipe-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .main {
   display: grid;
   gap: 24px;
@@ -250,6 +443,18 @@ textarea {
   background: #dc2626;
 }
 
+.back-btn {
+  background: transparent;
+  color: #5b21b6;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+
+.back-btn:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
 .output-card pre {
   white-space: pre-wrap;
   background: #f8fafc;
@@ -257,4 +462,369 @@ textarea {
   border-radius: 14px;
   min-height: 120px;
   margin-top: 20px;
+}
+
+/* Fridge Page Styles */
+.fridge-page {
+  background: linear-gradient(135deg, #f5f7fb 0%, #eff6ff 100%);
+  min-height: 100vh;
+}
+
+.fridge-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 20px;
+}
+
+.fridge-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.fridge-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 2.5vw, 3rem);
+  background: linear-gradient(135deg, #5b21b6, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fridge-header p {
+  margin: 12px 0 0;
+  color: #4b5563;
+}
+
+.fridge-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+.category-summary {
+  margin-bottom: 40px;
+}
+
+.category-summary h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.summary-card {
+  background: white;
+  border-left: 4px solid;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
+}
+
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.summary-info {
+  flex: 1;
+}
+
+.category-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.item-count {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.add-ingredient-section {
+  margin-bottom: 32px;
+}
+
+.add-ingredient-section h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.add-form {
+  display: grid;
+  grid-template-columns: 1fr 120px 120px 100px;
+  gap: 12px;
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+}
+
+.add-form input {
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.add-form input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.btn-add {
+  background: linear-gradient(135deg, #5b21b6, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(91, 33, 182, 0.3);
+}
+
+.btn-back-home {
+  background: white;
+  color: #5b21b6;
+  border: 2px solid #d1d5db;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-back-home:hover {
+  border-color: #5b21b6;
+  background: #f8f7ff;
+  transform: translateX(-4px);
+}
+
+.inventory-section h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #111827;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 18px;
+  border: 2px dashed #e5e7eb;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+}
+
+.empty-state p {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+.ingredient-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.ingredient-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+  transition: all 0.2s ease;
+}
+
+.ingredient-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.1);
+  border-color: #d1d5db;
+}
+
+.ingredient-info h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.ingredient-details {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ingredient-details .quantity {
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.ingredient-details .separator {
+  color: #d1d5db;
+}
+
+.ingredient-details .date {
+  font-style: italic;
+  color: #9ca3af;
+}
+
+.btn-remove {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-remove:hover {
+  background: #fecaca;
+  transform: scale(1.05);
+}
+
+/* Decision Gates Page Styles */
+.gates-section .card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 8px 24px;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+}
+
+.gate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.gate-row:last-child {
+  border-bottom: none;
+}
+
+.gate-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #111827;
+}
+
+.gate-options {
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.gate-btn {
+  background: transparent;
+  color: #475569;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gate-btn:hover {
+  background: #e2e8f0;
+}
+
+.gate-btn.active {
+  background: #5b21b6;
+  color: white;
+}
+
+.gate-summary {
+  margin-top: 28px;
+}
+
+.gate-summary h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.gate-summary p {
+  color: #4b5563;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .gate-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .add-form {
+    grid-template-columns: 1fr;
+  }
+
+  .ingredient-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .fridge-header {
+    padding: 24px 16px 16px;
+  }
+
+  .fridge-main {
+    padding: 0 16px 24px;
+  }
+
+  .fridge-header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-back-home {
+    align-self: flex-start;
+  }
 }

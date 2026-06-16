@@ -7,7 +7,7 @@ type Invoice = {
   uploadedAt: Date;
 };
 
-function InvoiceUpload() {
+function InvoiceUpload({ onNavigateHome }: { onNavigateHome: () => void }) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -37,6 +37,7 @@ function InvoiceUpload() {
 
   return (
     <div className="invoice-upload">
+      <button className="back-btn" onClick={onNavigateHome}>← Back</button>
       <h2>Supermarket Invoices</h2>
       <p>Upload a picture of your supermarket invoice to keep track of your purchases.</p>
 
